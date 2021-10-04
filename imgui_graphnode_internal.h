@@ -82,5 +82,7 @@ IMGUI_API char * ImGuiGraphNode_ReadToken(char ** stringp);
 IMGUI_API char * ImGuiGraphNode_ReadLine(char ** stringp);
 IMGUI_API bool ImGuiGraphNode_ReadGraphFromMemory(ImGuiGraphNode_Graph & graph, char const * data, size_t size);
 IMGUI_API char const * ImGuiGraphNode_GetEngineNameFromLayoutEnum(ImGuiGraphNodeLayout layout);
+IMGUI_API ImVec2 ImGuiGraphNode_BezierVec2(ImVec2 const * points, int count, float x);
+IMGUI_API ImVec2 ImGuiGraphNode_BSplineVec2(ImVec2 const * points, int count, float x);
 
 #endif /* !IMGUI_GRAPHNODE_INTERNAL_H_ */

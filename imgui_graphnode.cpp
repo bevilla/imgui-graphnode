@@ -99,18 +99,24 @@ void IMGUI_GRAPHNODE_NAMESPACE::EndNodeGraph()
         }
         for (ImGuiGraphNode_Edge const & edge : graph.edges)
         {
-            ImVec2 * points = (ImVec2 *)alloca(sizeof(*points) * edge.points.size());
-            for (size_t i = 0; i < edge.points.size(); ++i)
-            {
-                points[i].x = p.x + edge.points[i].x * ppu;
-                points[i].y = p.y + (graph.size.y - edge.points[i].y) * ppu;
-            }
             ImVec2 const textsize = ImGui::CalcTextSize(edge.label.c_str());
             drawlist->AddText(ImVec2(p.x + edge.labelPos.x * ppu - textsize.x / 2.f, p.y + (graph.size.y - edge.labelPos.y) * ppu - textsize.y / 2.f), edge.color, edge.label.c_str());
-            drawlist->AddPolyline(points, edge.points.size(), edge.color, ImDrawFlags_None, 1.f);
-            ImVec2 const lastpoint = points[edge.points.size() - 1];
-            float dirx = lastpoint.x - points[edge.points.size() - 2].x;
-            float diry = lastpoint.y - points[edge.points.size() - 2].y;
+            constexpr int pointscount = 512;
+            ImVec2 points[pointscount];
+            for (int x = 0; x < pointscount; ++x)
+            {
+                points[x] = ImGuiGraphNode_BezierVec2(edge.points.data(), (int)edge.points.size(), x / float(pointscount - 1));
+                //points[x] = ImGuiGraphNode_BSplineVec2(edge.points.data(), (int)edge.points.size(), x / float(pointscount - 1));
+                points[x].y = graph.size.y - points[x].y;
+                points[x].x *= ppu;
+                points[x].y *= ppu;
+                points[x].x += p.x;
+                points[x].y += p.y;
+            }
+            drawlist->AddPolyline(points, pointscount, edge.color, ImDrawFlags_None, 1.f);
+            ImVec2 const lastpoint = points[pointscount - 1];
+            float dirx = lastpoint.x - points[pointscount - 2].x;
+            float diry = lastpoint.y - points[pointscount - 2].y;
             float const mag = ImSqrt(dirx * dirx + diry * diry);
             float const mul1 = ppu * 0.1f;
             float const mul2 = ppu * 0.0437f;

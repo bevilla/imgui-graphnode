@@ -33,7 +33,7 @@ void ImGuiNodeGraph::EndNodeGraph();
 Examples source code can be found in imgui_graphnode_demo.cpp
 
 ```c++
-if (ImGuiGraphNode::BeginNodeGraph(layout, ppu))
+if (ImGuiGraphNode::BeginNodeGraph(ImGuiGraphNodeLayout_Circo))
 {
     ImGuiGraphNode::NodeGraphAddNode("A");
     ImGuiGraphNode::NodeGraphAddNode("B");
@@ -49,7 +49,7 @@ if (ImGuiGraphNode::BeginNodeGraph(layout, ppu))
 ![alt text](https://github.com/bevilla/imgui-graphnode/raw/master/docs/example1.png "Example 1")
 
 ```c++
-if (ImGuiGraphNode::BeginNodeGraph(layout, ppu))
+if (ImGuiGraphNode::BeginNodeGraph(ImGuiGraphNodeLayout_Dot))
 {
     ImGuiGraphNode::NodeGraphAddNode("LR_0");
     ImGuiGraphNode::NodeGraphAddNode("LR_1");

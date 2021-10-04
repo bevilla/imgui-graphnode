@@ -384,29 +384,29 @@ void draw_example2(ImGuiGraphNodeLayout layout, float ppu)
 {
     if (ImGuiGraphNode::BeginNodeGraph(layout, ppu))
     {
-            ImGuiGraphNode::NodeGraphAddNode("LR_0");
-            ImGuiGraphNode::NodeGraphAddNode("LR_1");
-            ImGuiGraphNode::NodeGraphAddNode("LR_2");
-            ImGuiGraphNode::NodeGraphAddNode("LR_3");
-            ImGuiGraphNode::NodeGraphAddNode("LR_4");
-            ImGuiGraphNode::NodeGraphAddNode("LR_5");
-            ImGuiGraphNode::NodeGraphAddNode("LR_6");
-            ImGuiGraphNode::NodeGraphAddNode("LR_7");
-            ImGuiGraphNode::NodeGraphAddNode("LR_8");
-            ImGuiGraphNode::NodeGraphAddEdge("SS(B)", "LR_0", "LR_2");
-            ImGuiGraphNode::NodeGraphAddEdge("SS(S)", "LR_0", "LR_1");
-            ImGuiGraphNode::NodeGraphAddEdge("S($end)", "LR_1", "LR_3");
-            ImGuiGraphNode::NodeGraphAddEdge("SS(b)", "LR_2", "LR_6");
-            ImGuiGraphNode::NodeGraphAddEdge("SS(a)", "LR_2", "LR_5");
-            ImGuiGraphNode::NodeGraphAddEdge("S(A)", "LR_2", "LR_4");
-            ImGuiGraphNode::NodeGraphAddEdge("S(b)", "LR_5", "LR_7");
-            ImGuiGraphNode::NodeGraphAddEdge("S(a)", "LR_5", "LR_5");
-            ImGuiGraphNode::NodeGraphAddEdge("S(b)", "LR_6", "LR_6");
-            ImGuiGraphNode::NodeGraphAddEdge("S(a)", "LR_6", "LR_5");
-            ImGuiGraphNode::NodeGraphAddEdge("S(b)", "LR_7", "LR_8");
-            ImGuiGraphNode::NodeGraphAddEdge("S(a)", "LR_7", "LR_5");
-            ImGuiGraphNode::NodeGraphAddEdge("S(b)", "LR_8", "LR_6");
-            ImGuiGraphNode::NodeGraphAddEdge("S(a)", "LR_8", "LR_5");
+        ImGuiGraphNode::NodeGraphAddNode("LR_0");
+        ImGuiGraphNode::NodeGraphAddNode("LR_1");
+        ImGuiGraphNode::NodeGraphAddNode("LR_2");
+        ImGuiGraphNode::NodeGraphAddNode("LR_3");
+        ImGuiGraphNode::NodeGraphAddNode("LR_4");
+        ImGuiGraphNode::NodeGraphAddNode("LR_5");
+        ImGuiGraphNode::NodeGraphAddNode("LR_6");
+        ImGuiGraphNode::NodeGraphAddNode("LR_7");
+        ImGuiGraphNode::NodeGraphAddNode("LR_8");
+        ImGuiGraphNode::NodeGraphAddEdge("SS(B)", "LR_0", "LR_2");
+        ImGuiGraphNode::NodeGraphAddEdge("SS(S)", "LR_0", "LR_1");
+        ImGuiGraphNode::NodeGraphAddEdge("S($end)", "LR_1", "LR_3");
+        ImGuiGraphNode::NodeGraphAddEdge("SS(b)", "LR_2", "LR_6");
+        ImGuiGraphNode::NodeGraphAddEdge("SS(a)", "LR_2", "LR_5");
+        ImGuiGraphNode::NodeGraphAddEdge("S(A)", "LR_2", "LR_4");
+        ImGuiGraphNode::NodeGraphAddEdge("S(b)", "LR_5", "LR_7");
+        ImGuiGraphNode::NodeGraphAddEdge("S(a)", "LR_5", "LR_5");
+        ImGuiGraphNode::NodeGraphAddEdge("S(b)", "LR_6", "LR_6");
+        ImGuiGraphNode::NodeGraphAddEdge("S(a)", "LR_6", "LR_5");
+        ImGuiGraphNode::NodeGraphAddEdge("S(b)", "LR_7", "LR_8");
+        ImGuiGraphNode::NodeGraphAddEdge("S(a)", "LR_7", "LR_5");
+        ImGuiGraphNode::NodeGraphAddEdge("S(b)", "LR_8", "LR_6");
+        ImGuiGraphNode::NodeGraphAddEdge("S(a)", "LR_8", "LR_5");
         ImGuiGraphNode::EndNodeGraph();
     }
 }

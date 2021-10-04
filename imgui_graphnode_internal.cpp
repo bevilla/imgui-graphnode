@@ -1,5 +1,6 @@
 #include "imgui_graphnode.h"
 #include "imgui_graphnode_internal.h"
+#include "imgui_internal.h"
 
 ImGuiGraphNodeContext g_ctx;
 
@@ -143,4 +144,72 @@ char const * ImGuiGraphNode_GetEngineNameFromLayoutEnum(ImGuiGraphNodeLayout lay
             IM_ASSERT(false);
             return "";
     }
+}
+
+float ImGuiGraphNode_BSplineVec2ComputeK(ImVec2 const * p, float const * t, int i, int k, float x)
+{
+    auto const f = [](float const * t, int i, int k, float x) -> float
+    {
+        if (t[i + k] == t[i])
+            return 0.f;
+        return (x - t[i]) / (t[i + k] - t[i]);
+    };
+    auto g = ImGuiGraphNode_BSplineVec2ComputeK;
+    if (k == 0)
+        return (x < t[i] || x >= t[i + 1]) ? 0.f : 1.f;
+    return f(t, i, k, x) * g(p, t, i, k - 1, x) + (1.f - f(t, i + 1, k, x)) * g(p, t, i + 1, k - 1, x);
+}
+
+ImVec2 ImGuiGraphNode_BSplineVec2(ImVec2 const * p, int m, int n, float x)
+{
+    if (n > (m - 2)) n = m - 2;
+    int const knotscount = m + n + 1;
+    float * const knots = (float *)alloca(knotscount * sizeof(*knots));
+    int i = 0;
+
+    for (; i <= n; ++i) knots[i] = 0.f;
+    for (; i < m; ++i) knots[i] = i / (float)(m + n);
+    for (; i < knotscount; ++i) knots[i] = 1.f;
+
+    ImVec2 result(0.f, 0.f);
+
+    for (i = 0; i < m; ++i)
+    {
+        float const k = ImGuiGraphNode_BSplineVec2ComputeK(p, knots, i, n, x);
+
+        result.x += p[i].x * k;
+        result.y += p[i].y * k;
+    }
+    return result;
+}
+
+ImVec2 ImGuiGraphNode_BSplineVec2(ImVec2 const * points, int count, float x)
+{
+    return ImGuiGraphNode_BSplineVec2(points, count, 3, ImClamp(x, 0.f, 0.9999f));
+}
+
+int ImGuiGraphNode_BinomialCoefficient(int n, int k)
+{
+    if (k == 0 || n == k)
+    {
+        return 1;
+    }
+    else
+    {
+        return ImGuiGraphNode_BinomialCoefficient(n - 1, k - 1) + ImGuiGraphNode_BinomialCoefficient(n - 1, k);
+    }
+}
+
+ImVec2 ImGuiGraphNode_BezierVec2(ImVec2 const * points, int count, float x)
+{
+    ImVec2 result(0.f, 0.f);
+
+    for (int i = 0; i < count; ++i)
+    {
+        float const k = ImGuiGraphNode_BinomialCoefficient(count - 1, i) * ImPow(1 - x, count - i - 1) * ImPow(x, i);
+
+        result.x += points[i].x * k;
+        result.y += points[i].y * k;
+    }
+    return result;
 }
