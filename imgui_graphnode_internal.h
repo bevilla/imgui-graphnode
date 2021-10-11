@@ -23,16 +23,6 @@ extern "C"
         _name[size] = '\0'; \
     } while(0)
 
-struct ImGuiGraphNodeContext
-{
-    GVC_t * gvcontext = nullptr;
-    graph_t * gvgraph = nullptr;
-    ImGuiGraphNodeLayout layout = ImGuiGraphNodeLayout_Dot;
-    float pixel_per_unit = 100.f;
-};
-
-extern ImGuiGraphNodeContext g_ctx;
-
 struct ImGuiGraphNode_Node
 {
     std::string name;
@@ -61,6 +51,19 @@ struct ImGuiGraphNode_Graph
     float scale;
 };
 
+struct ImGuiGraphNodeContext
+{
+    GVC_t * gvcontext = nullptr;
+    graph_t * gvgraph = nullptr;
+    ImGuiGraphNodeLayout layout = ImGuiGraphNodeLayout_Dot;
+    ImGuiGraphNode_Graph graph;
+    std::string graphid_previous;
+    std::string graphid_current;
+    float pixel_per_unit = 100.f;
+};
+
+extern ImGuiGraphNodeContext g_ctx;
+
 template <size_t N>
 class ImGuiGraphNode_ShortString
 {
@@ -69,6 +72,7 @@ public:
     friend ImGuiGraphNode_ShortString<16> ImVec4ColorToString(ImVec4 const & color);
 
     operator char *() { return buf; }
+    operator char const *() const { return buf; }
 
 private:
     char buf[N];
@@ -84,5 +88,6 @@ IMGUI_API bool ImGuiGraphNode_ReadGraphFromMemory(ImGuiGraphNode_Graph & graph, 
 IMGUI_API char const * ImGuiGraphNode_GetEngineNameFromLayoutEnum(ImGuiGraphNodeLayout layout);
 IMGUI_API ImVec2 ImGuiGraphNode_BezierVec2(ImVec2 const * points, int count, float x);
 IMGUI_API ImVec2 ImGuiGraphNode_BSplineVec2(ImVec2 const * points, int count, float x);
+IMGUI_API void ImGuiGraphNodeRenderGraphLayout(ImGuiGraphNode_Graph & graph);
 
 #endif /* !IMGUI_GRAPHNODE_INTERNAL_H_ */

@@ -188,15 +188,63 @@ ImVec2 ImGuiGraphNode_BSplineVec2(ImVec2 const * points, int count, float x)
     return ImGuiGraphNode_BSplineVec2(points, count, 3, ImClamp(x, 0.f, 0.9999f));
 }
 
-int ImGuiGraphNode_BinomialCoefficient(int n, int k)
+#define IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_CELL_1(_line, _cell) \
+    ImGuiGraphNode_BinomialCoefficient(_line, _cell), \
+
+#define IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_CELL_2(_line, _cell) \
+    IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_CELL_1(_line, _cell) \
+    IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_CELL_1(_line, _cell + 1)
+
+#define IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_CELL_4(_line, _cell) \
+    IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_CELL_2(_line, _cell) \
+    IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_CELL_2(_line, _cell + 2)
+
+#define IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_CELL_8(_line, _cell) \
+    IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_CELL_4(_line, _cell) \
+    IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_CELL_4(_line, _cell + 4)
+
+#define IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_CELL_16(_line, _cell) \
+    IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_CELL_8(_line, _cell) \
+    IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_CELL_8(_line, _cell + 8)
+
+#define IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_LINE_1(_line) \
+    { IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_CELL_16(_line, 0) },
+
+#define IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_LINE_2(_line) \
+    IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_LINE_1(_line) \
+    IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_LINE_1(_line + 1)
+
+#define IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_LINE_4(_line) \
+    IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_LINE_2(_line) \
+    IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_LINE_2(_line + 2)
+
+#define IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_LINE_8(_line) \
+    IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_LINE_4(_line) \
+    IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_LINE_4(_line + 4)
+
+#define IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_LINE_16(_line) \
+    IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_LINE_8(_line) \
+    IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_LINE_8(_line + 8)
+
+constexpr int ImGuiGraphNode_BinomialCoefficient(int n, int k)
 {
-    if (k == 0 || n == k)
+    return (n == 0 || k == 0 || n == k) ? 1 : ImGuiGraphNode_BinomialCoefficient(n - 1, k - 1) + ImGuiGraphNode_BinomialCoefficient(n - 1, k);
+}
+
+constexpr int ImGuiGraphNode_BinomialCoefficient_Table[16][16] =
+{
+    IMGUIGRAPHNODE_BINOMIALCOEFFICIENT_TABLE_LINE_16(0)
+};
+
+int ImGuiGraphNode_BinomialCoefficientTable(int n, int k)
+{
+    if (n >= 0 && n < 16 && k >= 0 && k < 16)
     {
-        return 1;
+        return ImGuiGraphNode_BinomialCoefficient_Table[n][k];
     }
     else
     {
-        return ImGuiGraphNode_BinomialCoefficient(n - 1, k - 1) + ImGuiGraphNode_BinomialCoefficient(n - 1, k);
+        return ImGuiGraphNode_BinomialCoefficient(n, k);
     }
 }
 
@@ -206,10 +254,30 @@ ImVec2 ImGuiGraphNode_BezierVec2(ImVec2 const * points, int count, float x)
 
     for (int i = 0; i < count; ++i)
     {
-        float const k = ImGuiGraphNode_BinomialCoefficient(count - 1, i) * ImPow(1 - x, count - i - 1) * ImPow(x, i);
+        float const k = ImGuiGraphNode_BinomialCoefficientTable(count - 1, i) * ImPow(1 - x, count - i - 1) * ImPow(x, i);
 
         result.x += points[i].x * k;
         result.y += points[i].y * k;
     }
     return result;
+}
+
+void ImGuiGraphNodeRenderGraphLayout(ImGuiGraphNode_Graph & graph)
+{
+    char * data = nullptr;
+    unsigned int size = 0;
+    char const * const engine = ImGuiGraphNode_GetEngineNameFromLayoutEnum(g_ctx.layout);
+    int ok = 0;
+
+    graph = ImGuiGraphNode_Graph();
+    IM_ASSERT(g_ctx.gvcontext != nullptr);
+    IM_ASSERT(g_ctx.gvgraph != nullptr);
+    agattr(g_ctx.gvgraph, AGEDGE, (char *)"dir", "none");
+    ok = gvLayout(g_ctx.gvcontext, g_ctx.gvgraph, engine);
+    IM_ASSERT(ok == 0);
+    ok = gvRenderData(g_ctx.gvcontext, g_ctx.gvgraph, "plain", &data, &size);
+    IM_ASSERT(ok == 0);
+    ImGuiGraphNode_ReadGraphFromMemory(graph, data, size);
+    gvFreeRenderData(data);
+    gvFreeLayout(g_ctx.gvcontext, g_ctx.gvgraph);
 }

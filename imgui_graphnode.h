@@ -24,6 +24,8 @@ enum ImGuiGraphNodeLayout_
 
 namespace IMGUI_GRAPHNODE_NAMESPACE
 {
+    IMGUI_API void CreateContext();
+    IMGUI_API void DestroyContext();
     IMGUI_API bool BeginNodeGraph(ImGuiGraphNodeLayout layout = ImGuiGraphNodeLayout_Dot, float pixel_per_unit = 100.f);
     IMGUI_API void NodeGraphAddNode(char const * id);
     IMGUI_API void NodeGraphAddNode(char const * id, ImVec4 const & color, ImVec4 const & fillcolor);

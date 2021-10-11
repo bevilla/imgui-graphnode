@@ -20,6 +20,8 @@ Add the following files to your project:
 
 A small set of functions are provided, allowing to draw a graph by declaring nodes and edges.
 ```c++
+void ImGuiNodeGraph::CreateContext();
+void ImGuiNodeGraph::DestroyContext();
 bool ImGuiNodeGraph::BeginNodeGraph(ImGuiGraphNodeLayout layout = ImGuiGraphNodeLayout_Dot, float pixel_per_unit = 100.f);
 void ImGuiNodeGraph::NodeGraphAddNode(char const * id);
 void ImGuiNodeGraph::NodeGraphAddNode(char const * id, ImVec4 const & color, ImVec4 const & fillcolor);
