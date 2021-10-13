@@ -262,11 +262,11 @@ ImVec2 ImGuiGraphNode_BezierVec2(ImVec2 const * points, int count, float x)
     return result;
 }
 
-void ImGuiGraphNodeRenderGraphLayout(ImGuiGraphNode_Graph & graph)
+void ImGuiGraphNodeRenderGraphLayout(ImGuiGraphNode_Graph & graph, ImGuiGraphNodeLayout layout)
 {
     char * data = nullptr;
     unsigned int size = 0;
-    char const * const engine = ImGuiGraphNode_GetEngineNameFromLayoutEnum(g_ctx.layout);
+    char const * const engine = ImGuiGraphNode_GetEngineNameFromLayoutEnum(layout);
     int ok = 0;
 
     graph = ImGuiGraphNode_Graph();

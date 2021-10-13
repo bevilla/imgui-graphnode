@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
 extern "C"
 {
@@ -22,6 +23,9 @@ extern "C"
         memcpy(_name, _label, size); \
         _name[size] = '\0'; \
     } while(0)
+
+#define IMGUI_GRAPHNODE_DRAW_NODE_PATH_COUNT 32
+#define IMGUI_GRAPHNODE_DRAW_EDGE_PATH_COUNT 64
 
 struct ImGuiGraphNode_Node
 {
@@ -51,15 +55,45 @@ struct ImGuiGraphNode_Graph
     float scale;
 };
 
+struct ImGuiGraphNode_DrawNode
+{
+    ImVec2 path[IMGUI_GRAPHNODE_DRAW_NODE_PATH_COUNT];
+    ImVec2 textpos;
+    char const * text;
+    ImU32 color;
+    ImU32 fillcolor;
+};
+
+struct ImGuiGraphNode_DrawEdge
+{
+    ImVec2 path[IMGUI_GRAPHNODE_DRAW_EDGE_PATH_COUNT];
+    ImVec2 arrow1;
+    ImVec2 arrow2;
+    ImVec2 arrow3;
+    ImVec2 textpos;
+    char const * text;
+    ImU32 color;
+};
+
+struct ImGuiGraphNodeContextCache
+{
+    ImGuiGraphNode_Graph graph;
+    ImGuiGraphNodeLayout layout = ImGuiGraphNodeLayout_Dot;
+    float pixel_per_unit = 100.f;
+    std::vector<ImGuiGraphNode_DrawNode> drawnodes;
+    std::vector<ImGuiGraphNode_DrawEdge> drawedges;
+    ImVec2 cursor_previous;
+    ImVec2 cursor_current;
+    std::string graphid_previous;
+    std::string graphid_current;
+};
+
 struct ImGuiGraphNodeContext
 {
     GVC_t * gvcontext = nullptr;
     graph_t * gvgraph = nullptr;
-    ImGuiGraphNodeLayout layout = ImGuiGraphNodeLayout_Dot;
-    ImGuiGraphNode_Graph graph;
-    std::string graphid_previous;
-    std::string graphid_current;
-    float pixel_per_unit = 100.f;
+    ImGuiID lastid = 0;
+    std::map<ImGuiID, ImGuiGraphNodeContextCache> graph_caches;
 };
 
 extern ImGuiGraphNodeContext g_ctx;
@@ -88,6 +122,6 @@ IMGUI_API bool ImGuiGraphNode_ReadGraphFromMemory(ImGuiGraphNode_Graph & graph, 
 IMGUI_API char const * ImGuiGraphNode_GetEngineNameFromLayoutEnum(ImGuiGraphNodeLayout layout);
 IMGUI_API ImVec2 ImGuiGraphNode_BezierVec2(ImVec2 const * points, int count, float x);
 IMGUI_API ImVec2 ImGuiGraphNode_BSplineVec2(ImVec2 const * points, int count, float x);
-IMGUI_API void ImGuiGraphNodeRenderGraphLayout(ImGuiGraphNode_Graph & graph);
+IMGUI_API void ImGuiGraphNodeRenderGraphLayout(ImGuiGraphNode_Graph & graph, ImGuiGraphNodeLayout layout);
 
 #endif /* !IMGUI_GRAPHNODE_INTERNAL_H_ */

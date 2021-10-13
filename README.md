@@ -22,7 +22,7 @@ A small set of functions are provided, allowing to draw a graph by declaring nod
 ```c++
 void ImGuiNodeGraph::CreateContext();
 void ImGuiNodeGraph::DestroyContext();
-bool ImGuiNodeGraph::BeginNodeGraph(ImGuiGraphNodeLayout layout = ImGuiGraphNodeLayout_Dot, float pixel_per_unit = 100.f);
+bool ImGuiNodeGraph::BeginNodeGraph(char const * id, ImGuiGraphNodeLayout layout = ImGuiGraphNodeLayout_Dot, float pixel_per_unit = 100.f);
 void ImGuiNodeGraph::NodeGraphAddNode(char const * id);
 void ImGuiNodeGraph::NodeGraphAddNode(char const * id, ImVec4 const & color, ImVec4 const & fillcolor);
 void ImGuiNodeGraph::NodeGraphAddEdge(char const * id, char const * node_id_a, char const * node_id_b);

@@ -354,7 +354,7 @@ void draw_rbtree(ImGuiGraphNodeLayout layout, float ppu)
         ImGui::SameLine();
         ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "node '%s' not found", bufsearch);
     }
-    if (ImGuiGraphNode::BeginNodeGraph(layout, ppu))
+    if (ImGuiGraphNode::BeginNodeGraph("example3", layout, ppu))
     {
         if (tree.root)
         {
@@ -366,7 +366,7 @@ void draw_rbtree(ImGuiGraphNodeLayout layout, float ppu)
 
 void draw_example1(ImGuiGraphNodeLayout layout, float ppu)
 {
-    if (ImGuiGraphNode::BeginNodeGraph(layout, ppu))
+    if (ImGuiGraphNode::BeginNodeGraph("example1", layout, ppu))
     {
         ImGuiGraphNode::NodeGraphAddNode("A");
         ImGuiGraphNode::NodeGraphAddNode("B");
@@ -382,7 +382,7 @@ void draw_example1(ImGuiGraphNodeLayout layout, float ppu)
 
 void draw_example2(ImGuiGraphNodeLayout layout, float ppu)
 {
-    if (ImGuiGraphNode::BeginNodeGraph(layout, ppu))
+    if (ImGuiGraphNode::BeginNodeGraph("example2", layout, ppu))
     {
         ImGuiGraphNode::NodeGraphAddNode("LR_0");
         ImGuiGraphNode::NodeGraphAddNode("LR_1");
