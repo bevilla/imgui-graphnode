@@ -13,6 +13,7 @@ extern "C"
 }
 
 #include "imgui_graphnode.h"
+#include "imgui_internal.h"
 
 #define IMGUI_GRAPHNODE_CREATE_LABEL_ALLOCA(_name, _label) \
     char * _name; \
@@ -45,10 +46,23 @@ struct ImGuiGraphNode_Edge
     std::string label;
     ImVec2 labelPos;
     ImU32 color;
+    ImGuiID id;
+};
+
+struct ImGuiGraphNode_EdgeInfo
+{
+    ImU32 color;
+};
+
+struct ImGuiGraphNode_EdgeRectangle
+{
+    ImVec2 a, b, c, d;
 };
 
 struct ImGuiGraphNode_Graph
 {
+    std::map<ImGuiID, ImRect> nodesBB;
+    std::map<ImGuiID, std::vector<ImGuiGraphNode_EdgeRectangle>> edgesRectangle;
     std::vector<ImGuiGraphNode_Node> nodes;
     std::vector<ImGuiGraphNode_Edge> edges;
     ImVec2 size;
@@ -77,6 +91,7 @@ struct ImGuiGraphNode_DrawEdge
 
 struct ImGuiGraphNodeContextCache
 {
+    std::map<ImGuiID, ImGuiGraphNode_EdgeInfo> edgeIdToInfo;
     ImGuiGraphNode_Graph graph;
     ImGuiGraphNodeLayout layout = ImGuiGraphNodeLayout_Dot;
     float pixel_per_unit = 100.f;
@@ -118,10 +133,10 @@ IMGUI_API ImU32 ImGuiGraphNode_StringToU32Color(char const * color);
 IMGUI_API ImVec4 ImGuiGraphNode_StringToImVec4Color(char const * color);
 IMGUI_API char * ImGuiGraphNode_ReadToken(char ** stringp);
 IMGUI_API char * ImGuiGraphNode_ReadLine(char ** stringp);
-IMGUI_API bool ImGuiGraphNode_ReadGraphFromMemory(ImGuiGraphNode_Graph & graph, char const * data, size_t size);
+IMGUI_API bool ImGuiGraphNode_ReadGraphFromMemory(ImGuiGraphNodeContextCache & cache, char const * data, size_t size);
 IMGUI_API char const * ImGuiGraphNode_GetEngineNameFromLayoutEnum(ImGuiGraphNodeLayout layout);
 IMGUI_API ImVec2 ImGuiGraphNode_BezierVec2(ImVec2 const * points, int count, float x);
 IMGUI_API ImVec2 ImGuiGraphNode_BSplineVec2(ImVec2 const * points, int count, float x);
-IMGUI_API void ImGuiGraphNodeRenderGraphLayout(ImGuiGraphNode_Graph & graph, ImGuiGraphNodeLayout layout);
+IMGUI_API void ImGuiGraphNodeRenderGraphLayout(ImGuiGraphNodeContextCache & cache);
 
 #endif /* !IMGUI_GRAPHNODE_INTERNAL_H_ */

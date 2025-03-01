@@ -51,7 +51,7 @@ char * ImGuiGraphNode_ReadLine(char ** stringp)
     return strsep(stringp, "\n");
 }
 
-bool ImGuiGraphNode_ReadGraphFromMemory(ImGuiGraphNode_Graph & graph, char const * data, size_t size)
+bool ImGuiGraphNode_ReadGraphFromMemory(ImGuiGraphNodeContextCache & cache, char const * data, size_t size)
 {
     char * copy = static_cast<char *>(alloca(sizeof(*copy) * size + 1));
     char * line = nullptr;
@@ -64,9 +64,9 @@ bool ImGuiGraphNode_ReadGraphFromMemory(ImGuiGraphNode_Graph & graph, char const
 
         if (strcmp(token, "graph") == 0)
         {
-            graph.scale = atof(ImGuiGraphNode_ReadToken(&line));
-            graph.size.x = atof(ImGuiGraphNode_ReadToken(&line));
-            graph.size.y = atof(ImGuiGraphNode_ReadToken(&line));
+            cache.graph.scale = atof(ImGuiGraphNode_ReadToken(&line));
+            cache.graph.size.x = atof(ImGuiGraphNode_ReadToken(&line));
+            cache.graph.size.y = atof(ImGuiGraphNode_ReadToken(&line));
         }
         else if (strcmp(token, "node") == 0)
         {
@@ -82,7 +82,7 @@ bool ImGuiGraphNode_ReadGraphFromMemory(ImGuiGraphNode_Graph & graph, char const
             ImGuiGraphNode_ReadToken(&line); // shape
             node.color = ImGuiGraphNode_StringToU32Color(ImGuiGraphNode_ReadToken(&line));
             node.fillcolor = ImGuiGraphNode_StringToU32Color(ImGuiGraphNode_ReadToken(&line));
-            graph.nodes.push_back(node);
+            cache.graph.nodes.push_back(node);
         }
         else if (strcmp(token, "edge") == 0)
         {
@@ -103,19 +103,30 @@ bool ImGuiGraphNode_ReadGraphFromMemory(ImGuiGraphNode_Graph & graph, char const
             char const * s3 = ImGuiGraphNode_ReadToken(&line);
             char const * s4 = ImGuiGraphNode_ReadToken(&line); (void)s4; // style
             char const * s5 = ImGuiGraphNode_ReadToken(&line);
+            char const * identifier = nullptr;
 
             if (s3)
             {
                 edge.label = s1;
                 edge.labelPos.x = atof(s2);
                 edge.labelPos.y = atof(s3);
-                edge.color = ImGuiGraphNode_StringToU32Color(s5);
+                identifier = s5 + 1;
             }
             else
             {
-                edge.color = ImGuiGraphNode_StringToU32Color(s2);
+                identifier = s2 + 1;
             }
-            graph.edges.push_back(edge);
+
+            // Edge ImGuiID is stored in the color property.
+            // It is used to access edge info, as graphviz doesn't serialize
+            // the edge's identifier. The actual color is then retrieve from
+            // the context cache.
+            edge.id = strtoul(identifier, nullptr, 16);
+            auto const it = cache.edgeIdToInfo.find(edge.id);
+            IM_ASSERT(it != cache.edgeIdToInfo.end());
+            edge.color = it->second.color;
+
+            cache.graph.edges.push_back(edge);
         }
         else if (strcmp(token, "stop") == 0)
         {
@@ -262,14 +273,14 @@ ImVec2 ImGuiGraphNode_BezierVec2(ImVec2 const * points, int count, float x)
     return result;
 }
 
-void ImGuiGraphNodeRenderGraphLayout(ImGuiGraphNode_Graph & graph, ImGuiGraphNodeLayout layout)
+void ImGuiGraphNodeRenderGraphLayout(ImGuiGraphNodeContextCache & cache)
 {
     char * data = nullptr;
     unsigned int size = 0;
-    char const * const engine = ImGuiGraphNode_GetEngineNameFromLayoutEnum(layout);
+    char const * const engine = ImGuiGraphNode_GetEngineNameFromLayoutEnum(cache.layout);
     int ok = 0;
 
-    graph = ImGuiGraphNode_Graph();
+    cache.graph = ImGuiGraphNode_Graph();
     IM_ASSERT(g_ctx.gvcontext != nullptr);
     IM_ASSERT(g_ctx.gvgraph != nullptr);
     agattr(g_ctx.gvgraph, AGEDGE, (char *)"dir", "none");
@@ -277,7 +288,7 @@ void ImGuiGraphNodeRenderGraphLayout(ImGuiGraphNode_Graph & graph, ImGuiGraphNod
     IM_ASSERT(ok == 0);
     ok = gvRenderData(g_ctx.gvcontext, g_ctx.gvgraph, "plain", &data, &size);
     IM_ASSERT(ok == 0);
-    ImGuiGraphNode_ReadGraphFromMemory(graph, data, size);
+    ImGuiGraphNode_ReadGraphFromMemory(cache, data, size);
     gvFreeRenderData(data);
     gvFreeLayout(g_ctx.gvcontext, g_ctx.gvgraph);
 }

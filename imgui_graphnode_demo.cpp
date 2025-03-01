@@ -411,6 +411,54 @@ void draw_example2(ImGuiGraphNodeLayout layout, float ppu)
     }
 }
 
+void draw_clickable(ImGuiGraphNodeLayout layout, float ppu)
+{
+    static bool nodeClickedA = false;
+    static bool nodeHoveredA = false;
+    static bool nodeClickedB = false;
+    static bool nodeHoveredB = false;
+    static bool edgeClicked = false;
+    static bool edgeHovered = false;
+
+    if (ImGuiGraphNode::BeginNodeGraph("clickable", layout, ppu))
+    {
+        // First node
+        ImVec4 color = ImVec4(1.f, 1.f, 1.f, 1.f);
+        if (nodeClickedA)
+            color = ImVec4(1.f, 0.f, 0.f, 1.f);
+        if (nodeHoveredA)
+            color = ImVec4(color.x * 0.7f, color.y * 0.7f, color.z * 0.7f, 1.f);
+        ImGuiGraphNode::NodeGraphAddNode("A", color, ImVec4(0.f, 0.f, 0.f, 0.f));
+        if (ImGui::IsItemClicked())
+            nodeClickedA = !nodeClickedA;
+        nodeHoveredA = ImGui::IsItemHovered();
+
+        // Second node
+        color = ImVec4(1.f, 1.f, 1.f, 1.f);
+        if (nodeClickedB)
+            color = ImVec4(1.f, 0.f, 0.f, 1.f);
+        if (nodeHoveredB)
+            color = ImVec4(color.x * 0.7f, color.y * 0.7f, color.z * 0.7f, 1.f);
+        ImGuiGraphNode::NodeGraphAddNode("B", color, ImVec4(0.f, 0.f, 0.f, 0.f));
+        if (ImGui::IsItemClicked())
+            nodeClickedB = !nodeClickedB;
+        nodeHoveredB = ImGui::IsItemHovered();
+
+        // Edge
+        color = ImVec4(1.f, 1.f, 1.f, 1.f);
+        if (edgeClicked)
+            color = ImVec4(1.f, 0.f, 0.f, 1.f);
+        if (edgeHovered)
+            color = ImVec4(color.x * 0.7f, color.y * 0.7f, color.z * 0.7f, 1.f);
+        ImGuiGraphNode::NodeGraphAddEdge("a->b", "A", "B", color);
+        if (ImGui::IsItemClicked())
+            edgeClicked = !edgeClicked;
+        edgeHovered = ImGui::IsItemHovered();
+
+        ImGuiGraphNode::EndNodeGraph();
+    }
+}
+
 void IMGUI_GRAPHNODE_NAMESPACE::ShowGraphNodeDemoWindow(bool * p_open)
 {
     static ImGuiGraphNodeLayout layout = ImGuiGraphNodeLayout_Circo;
@@ -434,33 +482,50 @@ void IMGUI_GRAPHNODE_NAMESPACE::ShowGraphNodeDemoWindow(bool * p_open)
         ImGui::SliderFloat("pixel per unit", &ppu, 30.f, 200.f);
         if (ImGui::BeginTabBar("tabbar", ImGuiTabBarFlags_None))
         {
-            if (ImGui::BeginTabItem("Example 1"))
-            {
-                draw_example1(layout, ppu);
-                ImGui::EndTabItem();
-            }
+            bool drawExample1 = ImGui::BeginTabItem("Example 1");
             if (ImGui::IsItemClicked())
             {
                 layout = ImGuiGraphNodeLayout_Circo;
             }
-            if (ImGui::BeginTabItem("Example 2"))
+            if (drawExample1)
+            {
+                draw_example1(layout, ppu);
+                ImGui::EndTabItem();
+            }
+
+            bool drawExample2 = ImGui::BeginTabItem("Example 2");
+            if (ImGui::IsItemClicked())
+            {
+                layout = ImGuiGraphNodeLayout_Dot;
+            }
+            if (drawExample2)
             {
                 draw_example2(layout, ppu);
                 ImGui::EndTabItem();
             }
+
+            bool drawRBTree = ImGui::BeginTabItem("Red-black tree");
             if (ImGui::IsItemClicked())
             {
                 layout = ImGuiGraphNodeLayout_Dot;
             }
-            if (ImGui::BeginTabItem("Red-black tree"))
+            if (drawRBTree)
             {
                 draw_rbtree(layout, ppu);
                 ImGui::EndTabItem();
             }
+
+            bool drawClickable = ImGui::BeginTabItem("Clickable");
             if (ImGui::IsItemClicked())
             {
-                layout = ImGuiGraphNodeLayout_Dot;
+                layout = ImGuiGraphNodeLayout_Circo;
             }
+            if (drawClickable)
+            {
+                draw_clickable(layout, ppu);
+                ImGui::EndTabItem();
+            }
+
             ImGui::EndTabBar();
         }
     }
