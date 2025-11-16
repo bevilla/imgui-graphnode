@@ -276,7 +276,7 @@ ImVec2 ImGuiGraphNode_BezierVec2(ImVec2 const * points, int count, float x)
 void ImGuiGraphNodeRenderGraphLayout(ImGuiGraphNodeContextCache & cache)
 {
     char * data = nullptr;
-    unsigned int size = 0;
+    size_t size = 0;
     char const * const engine = ImGuiGraphNode_GetEngineNameFromLayoutEnum(cache.layout);
     int ok = 0;
 
